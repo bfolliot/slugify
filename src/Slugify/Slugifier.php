@@ -2,7 +2,7 @@
 
 namespace Bfolliot\Slugify;
 
-class Slugify
+class Slugifier
 {
 
     /**
