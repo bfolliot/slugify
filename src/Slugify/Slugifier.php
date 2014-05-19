@@ -4,8 +4,12 @@ namespace Bfolliot\Slugify;
 
 class Slugifier
 {
-
-    protected $rules = array(
+    const DEFAULT_PATTERN   = '#[^!A-Za-z0-9]+#';
+    const DEFAULT_SEPARATOR = '-';
+    
+    protected $pattern      = self::DEFAULT_PATTERN;
+    protected $separator    = self::DEFAULT_SEPARATOR;
+    protected $rules        = array(
         '°' => 0,
         '¹' => 1,
         '²' => 2,
@@ -247,7 +251,17 @@ class Slugifier
      */
     public function slugify($string)
     {
-        $string = strtolower(strtr($string, $this->rules));
+        // Convert string to UTF-8
+        $string = mb_convert_encoding((string) $string, 'UTF-8', mb_list_encodings());
+
+        $string = strtr($string, $this->rules);
+
+        $string = preg_replace($this->pattern, $this->separator, $string);
+
+        $string = mb_strtolower($string);
+
+        $string = trim($string, $this->separator);
+
         return $string;
     }
 
@@ -263,5 +277,35 @@ class Slugifier
     {
         $this->rules[$character] = $replacement;
         return $this;
+    }
+
+    /**
+     * Set pattern of the slugifier.
+     * 
+     * By default, is self::DEFAULT_PATTERN
+     * 
+     * @param string $pattern
+     * 
+     * @return Slugifier
+     */
+    public function setPattern($pattern)
+    {
+        $this->pattern = $pattern;
+        return $this;
+    }
+
+    /**
+     * Set separator of the slugifier.
+     * 
+     * By default, is self::DEFAULT_SEPARATOR
+     * 
+     * @param string $separator
+     * 
+     * @return Slugifier
+     */
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
+        return $this;        
     }
 }
